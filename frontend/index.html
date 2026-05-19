@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FBC Marketplace</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        <h2>FBC Marketplace</h2>
+    </div>
+
+    <nav>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/shop.html">Products</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Support</a></li>
+        </ul>
+    </nav>
+
+    <div class="nav-actions">
+
+        <input type="text" placeholder="Search products..." class="search-bar">
+
+        <!-- LOGIN AREA -->
+        <div id="authArea"></div>
+
+        <!-- 👑 ADMIN BUTTON (hidden by default) -->
+        <button id="adminBtn" style="display:none;" onclick="goAdmin()">
+            👨‍💻 Admin Panel
+        </button>
+
+        <button class="cart-btn" onclick="goCart()">
+            🛒 Cart
+        </button>
+
+    </div>
+
+</header>
+
+<!-- HERO -->
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>Fellowship Baptist College Marketplace</h1>
+
+        <p>
+            Buy uniforms, books, department shirts,
+            and student essentials in one place.
+        </p>
+
+        <button class="shop-btn" onclick="goShop()">
+            Shop Now
+        </button>
+
+    </div>
+
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories">
+
+    <h2>Shop Categories</h2>
+
+    <div class="category-grid">
+
+        <div class="category-card">
+            <h3>👕 P.E Uniform</h3>
+        </div>
+
+        <div class="category-card">
+            <h3>🎓 School Uniform</h3>
+        </div>
+
+        <div class="category-card">
+            <h3>🏫 Department Shirts</h3>
+        </div>
+
+        <div class="category-card">
+            <h3>📚 Books</h3>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FEATURED -->
+<section class="featured-products">
+
+    <h2>Featured Products</h2>
+
+    <div class="products-grid">
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/250">
+            <h3>P.E Uniform</h3>
+            <button onclick="goShop()">View Product</button>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/250">
+            <h3>Department Shirt</h3>
+            <button onclick="goShop()">View Product</button>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/250">
+            <h3>Books</h3>
+            <button onclick="goShop()">View Product</button>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <h3>FBC Marketplace</h3>
+    <p>Fellowship Baptist College</p>
+</footer>
+
+<script>
+
+// =====================
+// NAVIGATION
+// =====================
+function goShop() {
+    window.location.href = "/shop.html";
+}
+
+function goCart() {
+    window.location.href = "/cart.html";
+}
+
+function goLogin() {
+    window.location.href = "/login.html";
+}
+
+function goRegister() {
+    window.location.href = "/register.html";
+}
+
+function goAccount() {
+    window.location.href = "/account.html";
+}
+
+function goAdmin() {
+    window.location.href = "/admin";
+}
+
+// =====================
+// LOGOUT
+// =====================
+async function logout() {
+
+    await fetch('/logout', {
+        method: 'POST',
+        credentials: 'include'
+    });
+
+    window.location.reload();
+}
+
+// =====================
+// CHECK USER + ADMIN
+// =====================
+async function checkAuth() {
+
+    try {
+
+        const res = await fetch('/me', {
+            credentials: 'include'
+        });
+
+        const data = await res.json();
+
+        const authArea = document.getElementById("authArea");
+        const adminBtn = document.getElementById("adminBtn");
+
+        if (!authArea) return;
+
+        if (data.loggedIn) {
+
+            // USER UI
+            authArea.innerHTML = `
+                <button onclick="goAccount()" class="login-btn">
+                    👤 ${data.name}
+                </button>
+
+                <button onclick="logout()" class="register-btn">
+                    Logout
+                </button>
+            `;
+
+            // 👑 SHOW ADMIN BUTTON ONLY IF ADMIN
+            if (data.is_admin === 1) {
+                adminBtn.style.display = "inline-block";
+            }
+
+        } else {
+
+            authArea.innerHTML = `
+                <button onclick="goLogin()" class="login-btn">
+                    Login
+                </button>
+
+                <button onclick="goRegister()" class="register-btn">
+                    Register
+                </button>
+            `;
+
+            adminBtn.style.display = "none";
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", checkAuth);
+
+</script>
+
+</body>
+</html>

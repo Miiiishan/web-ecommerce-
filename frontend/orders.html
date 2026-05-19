@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Orders</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body{
+            font-family:Poppins,sans-serif;
+            background:#f5f5f5;
+            margin:0;
+        }
+
+        .container{
+            max-width:900px;
+            margin:50px auto;
+            background:white;
+            padding:30px;
+            border-radius:15px;
+            box-shadow:0 4px 12px rgba(0,0,0,.1);
+        }
+
+        h1{
+            text-align:center;
+            color:#6d0f1d;
+        }
+
+        .order-card{
+            border:1px solid #ddd;
+            border-radius:10px;
+            padding:20px;
+            margin-bottom:20px;
+        }
+
+        .status{
+            color:green;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>📦 My Orders</h1>
+
+    <div id="ordersList"></div>
+
+</div>
+
+<script>
+
+async function loadOrders() {
+
+    const res = await fetch('/orders', {
+        credentials:'include'
+    });
+
+    const orders = await res.json();
+
+    const container =
+        document.getElementById(
+            'ordersList'
+        );
+
+    container.innerHTML = "";
+
+    if (orders.length === 0) {
+        container.innerHTML =
+        `
+            <h3>
+                No orders yet.
+            </h3>
+        `;
+        return;
+    }
+
+    orders.forEach(order => {
+
+        container.innerHTML += `
+            <div class="order-card">
+
+                <h3>
+                    Order #${order.id}
+                </h3>
+
+                <p>
+                    Total:
+                    ₱${order.total}
+                </p>
+
+                <p>
+                    Status:
+                    <span class="status">
+                        ${order.status}
+                    </span>
+                </p>
+
+                <p>
+                    Date:
+                    ${new Date(
+                        order.created_at
+                    ).toLocaleString()}
+                </p>
+
+            </div>
+        `;
+    });
+}
+
+loadOrders();
+
+</script>
+
+</body>
+</html>

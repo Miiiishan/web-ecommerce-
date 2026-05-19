@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FBC Marketplace - Shop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1 style="text-align:center; color:#6d0f1d;">
+    FBC Marketplace
+</h1>
+
+<div id="products" class="products-grid"></div>
+<script>
+async function checkLogin() {
+    const res = await fetch('/me', {
+        credentials: 'include'
+    });
+
+    const data = await res.json();
+
+    const authArea = document.getElementById("authArea");
+
+    if (data.loggedIn) {
+        authArea.innerHTML = `
+            <span>👋 ${data.name}</span>
+            <button onclick="logout()">Logout</button>
+        `;
+    }
+}
+
+checkLogin();
+</script>
+<script>
+async function loadProducts() {
+    try {
+        const res = await fetch('/products');
+        const products = await res.json();
+
+        const container = document.getElementById('products');
+        container.innerHTML = "";
+
+        products.forEach(p => {
+            container.innerHTML += `
+                <div class="product-card">
+                    <h3>${p.name}</h3>
+                    <p>${p.category}</p>
+                    <p>${p.description}</p>
+                    <p><b>₱${p.price}</b></p>
+
+                    <button onclick="addToCart(${p.id})">
+                        Add to Cart
+                    </button>
+                </div>
+            `;
+        });
+
+    } catch (err) {
+        console.log(err);
+        alert("Failed to load products");
+    }
+}
+
+
+// =======================
+// CART (SESSION BASED)
+// =======================
+async function addToCart(productId) {
+    try {
+        const res = await fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include', // 🔥 IMPORTANT FOR SESSION
+            body: JSON.stringify({
+                product_id: productId
+            })
+        });
+
+        const data = await res.json();
+        alert(data.message);
+
+    } catch (err) {
+        console.log(err);
+        alert("Failed to add to cart");
+    }
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>
