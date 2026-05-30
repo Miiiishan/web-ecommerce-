@@ -130,41 +130,7 @@ app.use(express.static(
 // =====================
 // DATABASE
 // =====================
-const mysql =
-require('mysql2');
-
-const db =
-mysql.createConnection({
-
-    host:
-    'localhost',
-
-    user:
-    'root',
-
-    password:
-    'Mishaeld0751',
-
-    database:
-    'fbc_marketplace'
-});
-
-db.connect(err=>{
-
-    if(err){
-
-        console.log(
-        '❌ Database Error:',
-        err
-        );
-
-        return;
-    }
-
-    console.log(
-    '✅ MySQL Connected'
-    );
-});
+const db = require('./db');
 // =====================
 // ADMIN MIDDLEWARE
 // =====================
