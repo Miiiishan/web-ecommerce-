@@ -1,9 +1,9 @@
 const mysql = require("mysql2");
 
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "Mishaeld0751",
+  host: process.env.DB_HOST || "sql12.freesqldatabase.com",
+  user: process.env.DB_USER || "sql12828718",
+  password: process.env.DB_PASSWORD || "rRT1eRRrFP",
   database: process.env.DB_NAME || "my_app",
   port: process.env.DB_PORT || 3306
 });
