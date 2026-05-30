@@ -1,0 +1,686 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Orders</title>
+
+<style>
+
+body{
+    font-family:Poppins,sans-serif;
+    background:#f5f5f5;
+    margin:0;
+    padding:30px;
+}
+
+h1{
+    color:#6d0f1d;
+}
+
+.orders-grid{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,
+    minmax(350px,1fr));
+    gap:20px;
+}
+
+.order-card{
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:
+    0 4px 10px
+    rgba(0,0,0,.1);
+}
+
+.order-card h2{
+    color:#6d0f1d;
+}
+
+.status{
+    font-weight:bold;
+}
+
+.pending{
+    color:orange;
+}
+
+.approved{
+    color:green;
+}
+
+.declined{
+    color:red;
+}
+
+.item{
+    border-bottom:
+    1px solid #eee;
+    padding:8px 0;
+}
+
+.btn{
+    border:none;
+    padding:10px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    color:white;
+    margin-top:10px;
+}
+
+.approve-btn{
+    background:green;
+}
+
+.decline-btn{
+    background:red;
+}
+
+.cancelled{
+    color:red;
+}
+
+.refund-pending{
+
+    color:#ff9800;
+}
+
+.refunded{
+
+    color:#2196f3;
+}
+
+
+.back-btn{
+    background:#6d0f1d;
+    margin-bottom:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<button
+class="btn back-btn"
+onclick="goAdmin()">
+
+← Back to Dashboard
+
+</button>
+
+<h1>
+📦 Customer Orders
+</h1>
+
+<div
+id="ordersContainer"
+class="orders-grid">
+
+Loading orders...
+
+</div>
+
+<script>
+
+async function loadOrders(){
+
+    const res =
+        await fetch(
+        '/admin/all-orders',
+        {
+            credentials:
+            'include'
+        });
+
+    const orders =
+        await res.json();
+
+    const container =
+        document.getElementById(
+        'ordersContainer'
+    );
+
+    container.innerHTML='';
+
+    if(
+        orders.length === 0
+    ){
+        container.innerHTML=
+        '<p>No orders yet.</p>';
+
+        return;
+    }
+
+    for(
+        const order
+        of orders
+    ){
+
+        const detailsRes =
+            await fetch(
+            '/admin/order-details/'
+            + order.id
+        );
+
+        const items =
+            await detailsRes.json();
+
+        let itemsHTML='';
+
+        items.forEach(item=>{
+
+            itemsHTML += `
+            <div class="item">
+
+                <strong>
+                ${item.name}
+                </strong>
+
+                <br>
+
+                Qty:
+                ${item.quantity}
+
+                <br>
+
+                ₱${item.price}
+
+            </div>
+            `;
+        });
+
+        container.innerHTML += `
+
+        <div class="order-card">
+
+            <h2>
+                Order #${order.id}
+            </h2>
+
+            <p>
+                <strong>
+                Customer:
+                </strong>
+
+                ${order.name}
+            </p>
+
+            <p>
+                <strong>
+                Total:
+                </strong>
+
+                ₱${order.total}
+            </p>
+
+            <p>
+
+                <strong>
+                Status:
+                </strong>
+
+                <span
+                class="
+                status
+                ${order.status
+                .toLowerCase()
+                .replace(/\s/g,'-')}
+                ">
+
+                ${order.status}
+
+                </span>
+
+            </p>
+
+            <p>
+                <strong>
+                Payment:
+                </strong>
+
+                ${order.payment_method
+                || 'Cash on Pickup'}
+            </p>
+
+            ${
+                order.payment_method
+                ===
+                'GCash'
+
+                &&
+
+                order.payment_proof
+
+                ?
+
+                `
+
+                <div
+                style="
+                margin:20px 0;
+                padding:15px;
+                background:#fafafa;
+                border-radius:14px;
+                ">
+
+                    <strong>
+                    Payment Proof
+                    </strong>
+
+                    <br><br>
+
+                    <img
+                    src="${order.payment_proof}"
+                    style="
+                    width:220px;
+                    border-radius:14px;
+                    box-shadow:
+                    0 4px 12px
+                    rgba(0,0,0,.15);
+                    ">
+
+                    <br><br>
+
+                    <button
+                    class="btn approve-btn"
+                    onclick="
+                    window.open(
+                    '${order.payment_proof}',
+                    '_blank'
+                    )
+                    ">
+
+                    🔍 View Full Proof
+
+                    </button>
+
+                </div>
+
+                `
+
+                :
+
+                ''
+            }
+
+            <h3>
+            Items
+            </h3>
+
+            ${itemsHTML}
+
+            ${
+
+            (
+            order.status === 'Pending'
+            ||
+            order.status === 'Pending Payment'
+            ||
+            order.status === 'Waiting for Approval'
+            )
+
+            ?
+
+            `
+
+            <div
+            style="
+            display:flex;
+            gap:10px;
+            margin-top:20px;
+            ">
+
+            <button
+            class="btn approve-btn"
+            onclick="
+            updateStatus(
+            ${order.id},
+            'Processing'
+            )
+            ">
+
+            ✅ Accept Order
+
+            </button>
+
+            <button
+            class="btn decline-btn"
+            onclick="
+updateStatus(
+${order.id},
+
+'${order.payment_method ===
+"GCash"
+
+?
+
+"Refund Pending"
+
+:
+
+"Cancelled"}'
+)
+
+            ">
+
+            ❌ Decline
+
+            </button>
+
+            </div>
+
+            `
+
+            :
+
+            (
+(
+order.status !== 'Completed'
+&&
+order.status !== 'Refunded'
+)
+
+
+            )
+
+            ?
+
+            `
+
+            <div
+            style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:20px;
+            ">
+
+            <button
+            class="btn"
+            style="
+            background:
+            ${order.status === 'Processing'
+            ? '#6d0f1d'
+            : '#ddd'};
+
+            color:
+            ${order.status === 'Processing'
+            ? 'white'
+            : 'black'};
+            "
+            onclick="
+            updateStatus(
+            ${order.id},
+            'Processing'
+            )
+            ">
+
+            ⚙ Processing
+
+            </button>
+
+            <button
+            class="btn"
+            style="
+            background:
+            ${order.status ===
+            'Ready for Pickup'
+            ? '#6d0f1d'
+            : '#ddd'};
+
+            color:
+            ${order.status ===
+            'Ready for Pickup'
+            ? 'white'
+            : 'black'};
+            "
+            onclick="
+            updateStatus(
+            ${order.id},
+            'Ready for Pickup'
+            )
+            ">
+
+            📦 Ready for Pickup
+
+            </button>
+
+            <button
+            class="btn"
+            style="
+            background:
+            ${order.status ===
+            'Completed'
+            ? '#2e7d32'
+            : '#ddd'};
+
+            color:
+            ${order.status ===
+            'Completed'
+            ? 'white'
+            : 'black'};
+            "
+            onclick="
+            updateStatus(
+            ${order.id},
+            'Completed'
+            )
+            ">
+
+            ✅ Complete
+
+            </button>
+
+            <button
+            class="btn decline-btn"
+            onclick="
+            updateStatus(
+            ${order.id},
+            'Cancelled'
+            )
+            ">
+
+            ❌ Cancel
+
+            </button>
+${
+(
+order.status ===
+'Refund Pending'
+
+||
+
+order.status ===
+'Cancelled'
+)
+
+&&
+
+order.payment_method ===
+'GCash'
+
+?
+
+`
+
+<div
+style="
+margin-top:20px;
+padding:15px;
+background:#fafafa;
+border-radius:12px;
+">
+
+<p>
+<strong>
+Upload Refund Screenshot
+</strong>
+</p>
+
+<input
+type="file"
+id="refundProof${order.id}"
+accept="image/*">
+
+<br><br>
+
+<button
+class="btn"
+style="
+background:#2196f3;
+"
+onclick="
+submitRefund(
+${order.id}
+)
+">
+
+💸 Confirm Refund
+
+</button>
+
+</div>
+
+`
+
+:
+
+''
+}
+
+            </div>
+
+            `
+
+            :
+
+            `
+
+            <button
+            class="btn approve-btn"
+            onclick="
+            viewOR(
+            ${order.id}
+            )">
+
+            🧾 View Receipt
+
+            </button>
+
+            `
+            }
+
+        </div>
+        `;
+    }
+}
+
+
+async function updateStatus(
+id,
+status
+){
+
+    await fetch(
+
+    '/admin/update-order-status/'
+    + id,
+
+    {
+        method:'PUT',
+
+        headers:{
+            'Content-Type':
+            'application/json'
+        },
+
+        body:
+        JSON.stringify({
+            status
+        })
+    });
+
+    loadOrders();
+}
+
+
+// ======================
+// NAVIGATION
+// ======================
+function goAdmin(){
+    window.location.href =
+    "/admin";
+}
+
+function viewOR(id){
+
+    window.open(
+        '/receipt/' + id,
+        '_blank'
+    );
+}
+
+async function submitRefund(id){
+
+    const fileInput =
+
+    document.getElementById(
+    'refundProof' + id
+    );
+
+    const file =
+    fileInput.files[0];
+
+    if(!file){
+
+        alert(
+        'Upload refund screenshot first'
+        );
+
+        return;
+    }
+
+    const formData =
+    new FormData();
+
+    formData.append(
+    'refundProof',
+    file
+    );
+
+    const uploadRes =
+
+    await fetch(
+
+    '/admin/upload-refund/'
+    + id,
+
+    {
+        method:'POST',
+        body:formData
+    });
+
+    const uploadData =
+    await uploadRes.json();
+
+    if(uploadData.success){
+
+        await updateStatus(
+        id,
+        'Refunded'
+        );
+
+        alert(
+        'Refund confirmed'
+        );
+    }
+}
+
+loadOrders();
+
+</script>
+
+</body>
+</html>

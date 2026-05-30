@@ -1,309 +1,819 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Cart - FBC Marketplace</title>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css">
+<title>My Cart</title>
 
-    <style>
-        body {
-            font-family: Poppins, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-        }
+<link rel="stylesheet" href="style.css">
 
-        .cart-container {
-            max-width: 900px;
-            margin: 50px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+<style>
+body{
+    font-family:Poppins,sans-serif;
+    background:#f5f5f5;
+    margin:0;
+}
 
-        h1 {
-            color: #6d0f1d;
-            text-align: center;
-        }
+.navbar{
+    background:#6d0f1d;
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
 
-        .cart-item {
-            border-bottom: 1px solid #ddd;
-            padding: 20px 0;
-        }
+.nav-buttons{
+    display:flex;
+    gap:10px;
+}
 
-        .price {
-            color: #6d0f1d;
-            font-weight: bold;
-        }
+.nav-btn{
+    background:white;
+    color:#6d0f1d;
+    border:none;
+    padding:10px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
 
-        .quantity-controls {
-            margin-top: 10px;
-        }
+.container{
+    width:90%;
+    max-width:1000px;
+    margin:30px auto;
+}
 
-        .quantity-controls button {
-            padding: 8px 14px;
-            border: none;
-            background: #6d0f1d;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+.cart-item{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+    box-shadow:
+    0 4px 10px
+    rgba(0,0,0,.1);
+}
 
-        .quantity-number {
-            margin: 0 10px;
-            font-weight: bold;
-        }
+.qty-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+}
 
-        .remove-btn {
-            background: crimson;
-            margin-top: 10px;
-            border: none;
-            padding: 10px 15px;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+.qty-btn{
+    width:35px;
+    height:35px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:18px;
+    background:#6d0f1d;
+    color:white;
+}
 
-        .cart-total {
-            margin-top: 30px;
-            text-align: right;
-        }
+.remove-btn{
+    background:red;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:10px;
+}
 
-        .checkout-btn {
-            background: #6d0f1d;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+.checkout-btn{
+    background:green;
+    color:white;
+    border:none;
+    padding:15px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:18px;
+}
 
-        .empty-cart {
-            text-align: center;
-            padding: 50px;
-        }
-    </style>
+.empty{
+    color:gray;
+}
+
+.payment-wrapper{
+
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    margin:30px 0;
+    box-shadow:
+    0 8px 25px rgba(0,0,0,.08);
+}
+
+.payment-title{
+
+    color:#6d0f1d;
+    margin:0;
+    font-size:32px;
+}
+
+.payment-subtitle{
+
+    color:#666;
+    margin:10px 0 25px;
+}
+
+.payment-options{
+
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.payment-card{
+
+    flex:1;
+    min-width:280px;
+
+    border:2px solid #eee;
+    border-radius:18px;
+
+    padding:22px;
+
+    background:white;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.payment-card:hover{
+
+    transform:
+    translateY(-4px);
+
+    border-color:#6d0f1d;
+}
+
+.payment-card input{
+
+    display:none;
+}
+
+.payment-card:has(input:checked){
+
+    border:3px solid #6d0f1d;
+    background:#fff8f8;
+}
+
+.payment-content{
+
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.payment-icon{
+
+    font-size:42px;
+}
+
+.payment-content h3{
+
+    margin:0;
+    color:#6d0f1d;
+    font-size:24px;
+}
+
+.payment-content p{
+
+    margin-top:6px;
+    color:#777;
+}
+
+#gcashSection{
+
+    display:none;
+    margin-top:30px;
+}
+
+.gcash-card{
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:35px;
+
+    text-align:center;
+
+    box-shadow:
+    0 8px 25px rgba(0,0,0,.08);
+}
+
+.gcash-card h3{
+
+    color:#6d0f1d;
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.gcash-card p{
+
+    color:#777;
+}
+
+.gcash-qr{
+
+    width:280px;
+    max-width:100%;
+
+    margin:25px auto;
+
+    border-radius:20px;
+
+    border:5px solid #f5f5f5;
+
+    box-shadow:
+    0 6px 20px rgba(0,0,0,.12);
+}
+
+.upload-btn{
+
+    display:inline-block;
+
+    background:#6d0f1d;
+    color:white;
+
+    padding:16px 26px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    margin-top:20px;
+
+    transition:.3s;
+}
+
+.upload-btn:hover{
+
+    background:#4a0913;
+    transform:
+    translateY(-2px);
+}
+
+</style>
 </head>
+
 <body>
 
-<div class="cart-container">
+<!-- NAVBAR -->
+<div class="navbar">
 
-    <h1>🛒 My Cart</h1>
+    <h2>
+        🛒 My Cart
+    </h2>
 
-    <div id="cartItems"></div>
-
-    <div class="cart-total">
-        <h2 id="totalPrice">
-            Total: ₱0
-        </h2>
+    <div class="nav-buttons">
 
         <button
-            onclick="checkoutCart()"
-            class="checkout-btn"
-        >
-            Checkout
+        class="nav-btn"
+        onclick="goShop()">
+
+        Shop
+
         </button>
+
+        <button
+        class="nav-btn"
+        onclick="goAccount()">
+
+        Account
+
+        </button>
+
+        <button
+        class="nav-btn"
+        onclick="goDashboard()">
+
+        Home
+
+        </button>
+
     </div>
 
 </div>
 
+<div class="container">
+
+    <div id="cartContainer">
+        Loading cart...
+    </div>
+
+
+    <h2 id="totalPrice"></h2>
+
+<div
+style="
+margin:20px 0;
+padding:20px;
+background:#fafafa;
+border-radius:12px;
+">
+
+<!-- PAYMENT SECTION -->
+<div class="payment-wrapper">
+
+    <h2 class="payment-title">
+        Payment Method
+    </h2>
+
+    <p class="payment-subtitle">
+        Choose how you'd like to pay
+    </p>
+
+    <div class="payment-options">
+
+        <label class="payment-card">
+
+            <input
+            type="radio"
+            name="paymentMethod"
+            value="Cash on Pickup"
+            checked>
+
+            <div class="payment-content">
+
+                <div class="payment-icon">
+                    💵
+                </div>
+
+                <div>
+
+                    <h3>
+                        Cash on Pickup
+                    </h3>
+
+                    <p>
+                        Pay when claiming
+                        your order
+                    </p>
+
+                </div>
+
+            </div>
+
+        </label>
+
+        <label class="payment-card">
+
+            <input
+            type="radio"
+            name="paymentMethod"
+            value="GCash">
+
+            <div class="payment-content">
+
+                <div class="payment-icon">
+                    📱
+                </div>
+
+                <div>
+
+                    <h3>
+                        GCash
+                    </h3>
+
+                    <p>
+                        Fast & secure
+                        payment
+                    </p>
+
+                </div>
+
+            </div>
+
+        </label>
+
+    </div>
+
+</div>
+
+<!-- GCASH -->
+<div id="gcashSection">
+
+    <div class="gcash-card">
+
+        <h3>
+            Secure GCash Payment
+        </h3>
+
+        <p>
+            Scan the QR code
+            to pay
+        </p>
+
+        <img
+        src="/images/gcash-qr.jpg"
+        class="gcash-qr">
+
+<label class="upload-btn">
+
+    📤 Upload Screenshot
+
+    <input
+    type="file"
+    id="paymentProof"
+    accept="image/*"
+    hidden>
+
+</label>
+
+<p
+id="uploadStatus"
+style="
+margin-top:15px;
+font-weight:bold;
+color:#6d0f1d;
+">
+
+No file selected
+
+</p>
+
+<img
+id="imagePreview"
+style="
+display:none;
+width:220px;
+margin-top:20px;
+border-radius:18px;
+box-shadow:
+0 6px 20px rgba(0,0,0,.15);
+">
+
+    </div>
+
+</div>
+
+<button
+class="checkout-btn"
+onclick="checkout()">
+
+Proceed to Checkout
+
+</button>
 <script>
 
-async function loadCart() {
+// =====================
+// LOAD CART
+// =====================
+async function loadCart(){
 
-    try {
-
-        const res = await fetch('/cart', {
-            credentials: 'include'
+    const res =
+        await fetch(
+        '/cart',
+        {
+            credentials:'include'
         });
 
-        const cart = await res.json();
+    const cart =
+        await res.json();
 
-        const container =
-            document.getElementById('cartItems');
-
-        container.innerHTML = "";
-
-        let total = 0;
-
-        if (cart.length === 0) {
-
-            container.innerHTML = `
-                <div class="empty-cart">
-                    <h2>Your cart is empty</h2>
-                    <p>Add products from the shop.</p>
-                </div>
-            `;
-
-            document.getElementById(
-                'totalPrice'
-            ).innerText = "Total: ₱0";
-
-            return;
-        }
-
-        cart.forEach(item => {
-
-            const subtotal =
-                item.price * item.quantity;
-
-            total += subtotal;
-
-            container.innerHTML += `
-                <div class="cart-item">
-
-                    <h3>${item.name}</h3>
-
-                    <p class="price">
-                        ₱${item.price}
-                    </p>
-
-                    <p>
-                        Quantity:
-                        ${item.quantity}
-                    </p>
-
-                    <p>
-                        Subtotal:
-                        ₱${subtotal}
-                    </p>
-
-                    <div class="quantity-controls">
-
-                        <button onclick="
-                            updateCart(
-                                ${item.id},
-                                'decrease'
-                            )
-                        ">
-                            -
-                        </button>
-
-                        <span class="quantity-number">
-                            ${item.quantity}
-                        </span>
-
-                        <button onclick="
-                            updateCart(
-                                ${item.id},
-                                'increase'
-                            )
-                        ">
-                            +
-                        </button>
-
-                    </div>
-
-                    <button
-                        class="remove-btn"
-                        onclick="
-                            removeItem(${item.id})
-                        "
-                    >
-                        Remove
-                    </button>
-
-                </div>
-            `;
-        });
-
+    const container =
         document.getElementById(
-            'totalPrice'
-        ).innerText =
-            "Total: ₱" + total;
+        'cartContainer'
+    );
 
-    } catch (err) {
+    const totalText =
+        document.getElementById(
+        'totalPrice'
+    );
 
-        console.log(err);
-        alert("Failed to load cart");
+    container.innerHTML='';
+
+    let total = 0;
+
+    if(cart.length === 0){
+
+        container.innerHTML=`
+        <p class="empty">
+        Cart is empty.
+        </p>
+        `;
+
+        totalText.innerText='';
+
+        return;
     }
+
+    cart.forEach(item=>{
+
+        total +=
+        item.price *
+        item.quantity;
+
+        container.innerHTML += `
+
+        <div class="cart-item">
+
+            <h2>
+                ${item.name}
+            </h2>
+
+            <p>
+                Price:
+                ₱${item.price}
+            </p>
+
+            <div class="qty-row">
+
+                <button
+                class="qty-btn"
+                onclick="
+                decreaseQty(
+                ${item.id}
+                )">
+
+                −
+
+                </button>
+
+                <strong>
+                    ${item.quantity}
+                </strong>
+
+                <button
+                class="qty-btn"
+                onclick="
+                increaseQty(
+                ${item.id}
+                )">
+
+                +
+
+                </button>
+
+            </div>
+
+            <p>
+                Subtotal:
+                ₱${
+                    item.price *
+                    item.quantity
+                }
+            </p>
+
+            <button
+            class="remove-btn"
+            onclick="
+            removeItem(
+            ${item.id}
+            )">
+
+            Remove
+
+            </button>
+
+        </div>
+        `;
+    });
+
+    totalText.innerText =
+    `Total: ₱${total}`;
 }
 
-
 // =====================
-// UPDATE QUANTITY
+// + BUTTON
 // =====================
-async function updateCart(cartId, action) {
+async function increaseQty(id){
 
-    await fetch('/cart/update', {
-        method: 'POST',
-        headers: {
-            'Content-Type':
-            'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-            cart_id: cartId,
-            action: action
-        })
+    await fetch(
+    '/cart/increase/' + id,
+    {
+        method:'PUT'
     });
 
     loadCart();
 }
 
-
 // =====================
-// REMOVE ITEM
+// - BUTTON
 // =====================
-async function removeItem(cartId) {
+async function decreaseQty(id){
 
-    await fetch('/cart/remove', {
-        method: 'POST',
-        headers: {
-            'Content-Type':
-            'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-            cart_id: cartId
-        })
+    await fetch(
+    '/cart/decrease/' + id,
+    {
+        method:'PUT'
     });
 
     loadCart();
 }
 
+// =====================
+// REMOVE
+// =====================
+async function removeItem(id){
+
+    const yes =
+        confirm(
+        'Remove item?'
+    );
+
+    if(!yes) return;
+
+    await fetch(
+    '/cart/remove',
+    {
+        method:'POST',
+
+        headers:{
+            'Content-Type':
+            'application/json'
+        },
+
+        body:JSON.stringify({
+            cart_id:id
+        })
+    });
+
+    loadCart();
+}
 
 // =====================
 // CHECKOUT
 // =====================
-async function checkoutCart() {
+async function checkout(){
 
-    const confirmCheckout =
-        confirm(
-            "Proceed to checkout?"
-        );
-
-    if (!confirmCheckout) return;
-
-    const res = await fetch(
-        '/checkout',
-        {
-            method: 'POST',
-            credentials: 'include'
-        }
+    const yes =
+    confirm(
+    'Proceed checkout?'
     );
 
+    if(!yes) return;
+
+    const paymentMethod =
+
+    document.querySelector(
+    'input[name="paymentMethod"]:checked'
+    ).value;
+
+    const formData =
+    new FormData();
+
+    formData.append(
+    'payment_method',
+    paymentMethod
+    );
+
+    if(paymentMethod==='GCash'){
+
+        const file =
+
+        document.getElementById(
+        'paymentProof'
+        ).files[0];
+
+        if(!file){
+
+            alert(
+            'Please upload payment screenshot'
+            );
+
+            return;
+        }
+
+        formData.append(
+        'payment_proof',
+        file
+        );
+    }
+
+    const res =
+    await fetch(
+    '/checkout',
+    {
+        method:'POST',
+        credentials:'include',
+        body:formData
+    });
+
     const data =
-        await res.json();
+    await res.json();
 
     alert(data.message);
 
-    if (
-        data.message ===
-        "Checkout successful!"
-    ) {
-        loadCart();
-    }
+    loadCart();
 }
 
+// =====================
+// NAVIGATION
+// =====================
+function goShop(){
+    window.location.href =
+    "/shop.html";
+}
 
-// LOAD CART
+function goAccount(){
+    window.location.href =
+    "/account.html";
+}
+
+function goDashboard(){
+    window.location.href =
+    "/";
+}
+
+// =====================
 loadCart();
+
+document
+.querySelectorAll(
+'input[name="paymentMethod"]'
+)
+.forEach(radio=>{
+
+    radio.addEventListener(
+    'change',
+    ()=>{
+
+        const selected =
+
+        document.querySelector(
+        'input[name="paymentMethod"]:checked'
+        ).value;
+
+        document.getElementById(
+        'gcashSection'
+        ).style.display =
+
+        selected === 'GCash'
+
+        ?
+
+        'block'
+
+        :
+
+        'none';
+    });
+});
+
+document
+
+.getElementById(
+'paymentProof'
+)
+
+.addEventListener(
+'change',
+function(){
+
+    const file =
+    this.files[0];
+
+    if(file){
+
+        document.getElementById(
+        'uploadStatus'
+        ).innerHTML =
+
+        '✅ '
+        +
+        file.name
+        +
+        ' selected';
+
+        const reader =
+        new FileReader();
+
+        reader.onload =
+        function(e){
+
+            const preview =
+
+            document.getElementById(
+            'imagePreview'
+            );
+
+            preview.src =
+            e.target.result;
+
+            preview.style.display =
+            'block';
+        };
+
+        reader.readAsDataURL(
+        file
+        );
+    }
+});
 
 </script>
 
 </body>
 </html>
+

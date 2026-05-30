@@ -1,24 +1,122 @@
 async function registerUser() {
-    try {
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
 
-        const res = await fetch('/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
+    try {
+
+        const name =
+        document.getElementById(
+        "name"
+        ).value;
+
+        const email =
+        document.getElementById(
+        "email"
+        ).value;
+
+        const password =
+        document.getElementById(
+        "password"
+        ).value;
+
+        const student_id =
+        document.getElementById(
+        "student_id"
+        )?.value || null;
+
+        const user_type =
+        document.getElementById(
+        "user_type"
+        )?.value || 'student';
+
+        const job_title =
+        document.getElementById(
+        "job_title"
+        )?.value || null;
+
+        if(
+            !name ||
+            !email ||
+            !password
+        ){
+            alert(
+            "Please fill all required fields."
+            );
+            return;
+        }
+
+        if(
+            user_type ===
+            'student'
+            &&
+            !student_id
+        ){
+            alert(
+            "Student ID is required."
+            );
+            return;
+        }
+
+        if(
+            (
+                user_type ===
+                'faculty'
+                ||
+                user_type ===
+                'staff'
+            )
+            &&
+            !job_title
+        ){
+            alert(
+            "Job title is required."
+            );
+            return;
+        }
+
+        const res =
+        await fetch(
+        '/register',
+        {
+            method:
+            'POST',
+
+            headers:{
+                'Content-Type':
+                'application/json'
+            },
+
+            body:
+            JSON.stringify({
+
+                name,
+                email,
+                password,
+                student_id,
+                user_type,
+                job_title
+
+            })
         });
 
-        const data = await res.json();
-        alert(data.message);
+        const data =
+        await res.json();
 
-    } catch (error) {
-        console.log(error);
-        alert("Error connecting to server");
+        alert(
+        data.message ||
+        "Registered successfully"
+        );
+
+    }
+    catch(error){
+
+        console.log(
+        error
+        );
+
+        alert(
+        "Error connecting to server"
+        );
     }
 }
-
 
 // =======================
 // LOGIN
@@ -169,3 +267,4 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
     checkLogin();
 });
+

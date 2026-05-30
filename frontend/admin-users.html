@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Users Management</title>
+
+    <style>
+        body{
+            font-family:Poppins;
+            background:#f5f5f5;
+            padding:40px;
+        }
+
+        h1{
+            color:#6d0f1d;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            background:white;
+            border-radius:15px;
+            overflow:hidden;
+            box-shadow:0 5px 15px rgba(0,0,0,.1);
+        }
+
+        th, td{
+            padding:15px;
+            text-align:left;
+            border-bottom:1px solid #ddd;
+        }
+
+        th{
+            background:#6d0f1d;
+            color:white;
+        }
+
+        button{
+            padding:8px 15px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            color:white;
+        }
+
+        .admin-btn{
+            background:green;
+        }
+
+        .delete-btn{
+            background:red;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>👥 Users Management</h1>
+
+<table>
+
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Student ID</th>
+    <th>User Type</th>
+    <th>Job Title</th>
+    <th>Admin</th>
+    <th>Admin Role</th>
+    <th>Actions</th>
+</tr>
+</thead>
+
+    <tbody id="usersTable"></tbody>
+
+</table>
+
+<script>
+
+async function loadUsers() {
+
+    const res =
+        await fetch(
+        '/admin/users',
+        {
+            credentials:
+            'include'
+        });
+
+    const users =
+        await res.json();
+
+    const table =
+        document.getElementById(
+            'usersTable'
+        );
+
+    table.innerHTML = '';
+
+    users.forEach(user => {
+
+        table.innerHTML += `
+        <tr>
+
+            <td>
+                ${user.id}
+            </td>
+
+            <td>
+                ${user.name}
+            </td>
+
+            <td>
+                ${user.email}
+            </td>
+
+            <td>
+                ${
+                    user.student_id
+                    || '-'
+                }
+            </td>
+
+            <td>
+                ${
+                    user.user_type
+                    || '-'
+                }
+            </td>
+
+            <td>
+                ${
+                    user.job_title
+                    || '-'
+                }
+            </td>
+
+            <td>
+                ${
+                    user.is_admin == 1
+                    ? 'Yes'
+                    : 'No'
+                }
+            </td>
+
+            <td>
+                ${
+                    user.admin_role
+                    || '-'
+                }
+            </td>
+
+            <td>
+
+                ${
+                    user.is_admin == 1
+                    ?
+
+                    `
+                    <button
+                    style="
+                    background:
+                    orange;
+                    "
+                    onclick="
+                    removeAdmin(
+                    ${user.id}
+                    )">
+
+                    Remove Admin
+
+                    </button>
+                    `
+
+                    :
+
+                    `
+                    <button
+                    class="
+                    admin-btn
+                    "
+                    onclick="
+                    makeAdmin(
+                    ${user.id}
+                    )">
+
+                    Make Admin
+
+                    </button>
+                    `
+                }
+
+                <button
+                class="
+                delete-btn
+                "
+                onclick="
+                deleteUser(
+                ${user.id}
+                )">
+
+                Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+        `;
+    });
+}
+
+async function makeAdmin(id){
+
+    await fetch(
+    '/admin/make-admin/' + id,
+    {
+        method:'PUT'
+    });
+
+    loadUsers();
+}
+
+async function removeAdmin(id){
+
+    const yes =
+        confirm(
+        'Remove admin access?'
+    );
+
+    if(!yes) return;
+
+    await fetch(
+    '/admin/remove-admin/' + id,
+    {
+        method:'PUT'
+    });
+
+    loadUsers();
+}
+
+async function deleteUser(id){
+
+    const yes =
+        confirm(
+        'Delete user?'
+    );
+
+    if(!yes) return;
+
+    await fetch(
+    '/admin/delete-user/' + id,
+    {
+        method:'DELETE'
+    });
+
+    loadUsers();
+}
+
+loadUsers();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+Category Manager
+</title>
+
+<style>
+
+body{
+    font-family:
+    Poppins,
+    sans-serif;
+
+    background:
+    #f5f5f5;
+
+    margin:0;
+
+    padding:40px;
+}
+
+.container{
+
+    max-width:1100px;
+
+    margin:auto;
+}
+
+.header{
+
+    display:flex;
+
+    justify-content:
+    space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+}
+
+.header h1{
+
+    color:#6d0f1d;
+}
+
+.back-btn{
+
+    background:#6d0f1d;
+
+    color:white;
+
+    padding:12px 20px;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    font-weight:bold;
+}
+
+.form-card{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:22px;
+
+    box-shadow:
+    0 6px 20px
+    rgba(
+        0,
+        0,
+        0,
+        .08
+    );
+
+    margin-bottom:30px;
+}
+
+.form-card h2{
+
+    color:#6d0f1d;
+
+    margin-bottom:20px;
+}
+
+input,
+textarea{
+
+    width:100%;
+
+    padding:14px;
+
+    border:
+    2px solid #ddd;
+
+    border-radius:12px;
+
+    margin-bottom:15px;
+
+    box-sizing:border-box;
+
+    font-size:15px;
+}
+
+textarea{
+
+    resize:none;
+
+    height:90px;
+}
+
+.checkbox-group{
+
+    display:flex;
+
+    gap:20px;
+
+    margin-bottom:20px;
+}
+
+button{
+
+    border:none;
+
+    cursor:pointer;
+
+    border-radius:12px;
+
+    padding:14px 20px;
+
+    font-weight:bold;
+}
+
+.add-btn{
+
+    background:#6d0f1d;
+
+    color:white;
+}
+
+.categories{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(
+        auto-fit,
+        minmax(
+            320px,
+            1fr
+        )
+    );
+
+    gap:20px;
+}
+
+.card{
+
+    background:white;
+
+    border-radius:22px;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 6px 18px
+    rgba(
+        0,
+        0,
+        0,
+        .08
+    );
+}
+
+.card img{
+
+    width:100%;
+
+    height:180px;
+
+    object-fit:cover;
+
+    background:#eee;
+}
+
+.card-content{
+
+    padding:20px;
+}
+
+.card h3{
+
+    color:#6d0f1d;
+
+    margin-bottom:8px;
+}
+
+.card p{
+
+    color:#666;
+
+    margin-bottom:15px;
+}
+
+.badges{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:15px;
+}
+
+.badge{
+
+    background:#eee;
+
+    padding:8px 12px;
+
+    border-radius:999px;
+
+    font-size:12px;
+}
+
+.featured{
+
+    background:#fff3cd;
+}
+
+.hidden{
+
+    background:#ffd6d6;
+}
+
+.actions{
+
+    display:flex;
+
+    gap:10px;
+}
+
+.edit-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+    flex:1;
+}
+
+.delete-btn{
+
+    background:#dc2626;
+
+    color:white;
+
+    flex:1;
+}
+
+</style>
+
+<!-- EDIT CATEGORY PANEL -->
+
+<div
+id="editPanel"
+
+style="
+display:none;
+position:fixed;
+top:50%;
+right:20px;
+transform:translateY(-50%);
+width:350px;
+background:white;
+padding:25px;
+border-radius:20px;
+box-shadow:0 6px 20px rgba(0,0,0,.2);
+z-index:999;
+">
+
+<h2>
+
+✏ Edit Category
+
+</h2>
+
+<input
+type="hidden"
+id="editId">
+
+<label>
+Category Name
+</label>
+
+<input
+id="editName"
+style="
+width:100%;
+margin-bottom:15px;
+">
+
+<label>
+Description
+</label>
+
+<input
+id="editDescription"
+style="
+width:100%;
+margin-bottom:15px;
+">
+
+<label>
+Change Image
+</label>
+
+<input
+type="file"
+id="editImage"
+accept="image/*"
+style="
+margin-bottom:15px;
+">
+
+<label>
+
+<input
+type="checkbox"
+id="editFeatured">
+
+Featured
+
+</label>
+
+<br><br>
+
+<label>
+
+<input
+type="checkbox"
+id="editHidden">
+
+Hidden
+
+</label>
+
+<br><br>
+
+<button
+onclick="saveCategoryEdit()"
+style="
+width:100%;
+background:#6d0f1d;
+color:white;
+padding:12px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+">
+
+💾 Save
+
+</button>
+
+<br><br>
+
+<button
+onclick="closeEdit()"
+style="
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+">
+
+✖ Close
+
+</button>
+
+</div>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+            🗂 Category Manager
+        </h1>
+
+        <a
+        href="/admin"
+        class="back-btn">
+
+        ← Back Admin
+
+        </a>
+
+    </div>
+
+    <div class="form-card">
+
+        <h2>
+            Add Category
+        </h2>
+
+        <input
+        id="name"
+        placeholder=
+        "Category Name">
+
+        <textarea
+        id="description"
+        placeholder=
+        "Description">
+
+        </textarea>
+
+        <label>
+            Category Image
+        </label>
+
+<input
+type="file"
+id="image"
+
+accept="image/*">
+
+        <div class=
+        "checkbox-group">
+
+            <label>
+
+                <input
+                type="checkbox"
+                id="featured">
+
+                Featured
+
+            </label>
+
+            <label>
+
+                <input
+                type="checkbox"
+                id="hidden">
+
+                Hidden
+
+            </label>
+
+        </div>
+
+        <button
+        class="add-btn"
+        onclick=
+        "addCategory()">
+
+        Add Category
+
+        </button>
+
+    </div>
+
+    <div
+    class="categories"
+    id="categoryList">
+
+    </div>
+
+</div>
+
+<script>
+
+async function
+loadCategories(){
+
+    const res =
+    await fetch(
+    '/categories'
+    );
+
+    const categories =
+    await res.json();
+
+    const container =
+    document
+    .getElementById(
+    'categoryList'
+    );
+
+    container.innerHTML='';
+
+    categories.forEach(c=>{
+
+        container.innerHTML +=
+        `
+        <div class=
+        "card">
+
+            <img src=
+            "${
+                c.image ||
+                'https://via.placeholder.com/400x200'
+            }">
+
+            <div class=
+            "card-content">
+
+                <h3>
+
+                ${c.name}
+
+                </h3>
+
+                <p>
+
+                ${
+                    c.description ||
+                    'No description'
+                }
+
+                </p>
+
+                <div class=
+                "badges">
+
+                    ${
+                        c.featured
+                        ?
+                        `<div class=
+                        "badge featured">
+
+                        ⭐ Featured
+
+                        </div>`
+                        :
+                        ''
+                    }
+
+                    ${
+                        c.hidden
+                        ?
+                        `<div class=
+                        "badge hidden">
+
+                        👁 Hidden
+
+                        </div>`
+                        :
+                        ''
+                    }
+
+                </div>
+
+                <div class=
+                "actions">
+<button
+class="edit-btn"
+
+onclick='editCategory(
+
+${c.id},
+
+${JSON.stringify(c.name)},
+
+${JSON.stringify(
+c.description
+|| ''
+)},
+
+${JSON.stringify(
+c.image
+|| ''
+)},
+
+${c.featured},
+
+${c.hidden}
+
+)'>
+
+✏ Edit
+
+</button>
+                    
+
+                    <button
+                    class=
+                    "delete-btn"
+
+                    onclick=
+                    "deleteCategory(
+                    ${c.id}
+                    )">
+
+                    Delete
+
+                    </button>
+                    
+                </div>
+
+            </div>
+
+        </div>
+        `;
+
+        
+    });
+}
+
+async function
+addCategory(){
+
+    try{
+
+        const name =
+        document
+        .getElementById(
+        'name'
+        ).value.trim();
+
+        const description =
+        document
+        .getElementById(
+        'description'
+        ).value.trim();
+
+        const featured =
+        document
+        .getElementById(
+        'featured'
+        ).checked;
+
+        const hidden =
+        document
+        .getElementById(
+        'hidden'
+        ).checked;
+
+        const imageInput =
+        document
+        .getElementById(
+        'image'
+        );
+
+        const imageFile =
+        imageInput.files[0];
+
+        if(!name){
+
+            alert(
+            'Please enter category name'
+            );
+
+            return;
+        }
+
+        const formData =
+        new FormData();
+
+        formData.append(
+        'name',
+        name
+        );
+
+        formData.append(
+        'description',
+        description
+        );
+
+        formData.append(
+        'featured',
+        featured
+        );
+
+        formData.append(
+        'hidden',
+        hidden
+        );
+
+        if(imageFile){
+
+            formData.append(
+            'image',
+            imageFile
+            );
+        }
+
+        const res =
+        await fetch(
+        '/categories/add',
+        {
+
+            method:'POST',
+
+            body:
+            formData
+        });
+
+        const data =
+        await res.json();
+
+        if(data.success){
+
+            alert(
+            'Category Added!'
+            );
+
+            location.reload();
+
+        }else{
+
+            alert(
+            'Failed to add category'
+            );
+        }
+
+    }catch(err){
+
+        console.log(err);
+
+        alert(
+        'Something went wrong'
+        );
+    }
+}
+
+async function
+deleteCategory(id){
+
+    await fetch(
+        '/categories/' +
+        id,
+        {
+            method:
+            'DELETE'
+        }
+    );
+
+    loadCategories();
+}
+
+function editCategory(
+id,
+name,
+description,
+image,
+featured,
+hidden
+){
+
+    document
+    .getElementById(
+    'editPanel'
+    )
+    .style.display =
+    'block';
+
+    document
+    .getElementById(
+    'editId'
+    ).value =
+    id;
+
+    document
+    .getElementById(
+    'editName'
+    ).value =
+    name;
+
+    document
+    .getElementById(
+    'editDescription'
+    ).value =
+    description;
+
+    document
+    .getElementById(
+    'editFeatured'
+    ).checked =
+    featured == 1;
+
+    document
+    .getElementById(
+    'editHidden'
+    ).checked =
+    hidden == 1;
+}
+
+function closeEdit(){
+
+    document
+    .getElementById(
+    'editPanel'
+    )
+    .style.display =
+    'none';
+}
+
+async function
+saveCategoryEdit(){
+
+    const formData =
+    new FormData();
+
+    formData.append(
+    'name',
+    document
+    .getElementById(
+    'editName'
+    ).value
+    );
+
+    formData.append(
+    'description',
+    document
+    .getElementById(
+    'editDescription'
+    ).value
+    );
+
+    formData.append(
+    'featured',
+    document
+    .getElementById(
+    'editFeatured'
+    ).checked
+    );
+
+    formData.append(
+    'hidden',
+    document
+    .getElementById(
+    'editHidden'
+    ).checked
+    );
+
+    const image =
+    document
+    .getElementById(
+    'editImage'
+    )
+    .files[0];
+
+    if(image){
+
+        formData.append(
+        'image',
+        image
+        );
+    }
+
+    const id =
+    document
+    .getElementById(
+    'editId'
+    ).value;
+
+    const res =
+    await fetch(
+
+    '/categories/update/'
+    + id,
+
+    {
+
+        method:'PUT',
+
+        body:
+        formData
+    });
+
+    const data =
+    await res.json();
+
+    if(data.success){
+
+        alert(
+        'Updated!'
+        );
+
+        location.reload();
+    }
+}
+
+loadCategories();
+
+</script>
+
+</body>
+
+</html>

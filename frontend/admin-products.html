@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Products</title>
+
+    <link rel="stylesheet" href="style.css">
+    
+
+    <style>
+        body {
+            font-family: Poppins, sans-serif;
+            margin: 0;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #6d0f1d;
+        }
+
+        .form-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            margin-bottom: 30px;
+        }
+
+        .form-box input,
+        .form-box select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background: #6d0f1d;
+            color: white;
+        }
+
+        .back-btn {
+            background: gray;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(250px,1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+        }
+
+        .delete-btn {
+            background: crimson;
+            color: white;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <button class="back-btn"
+            onclick="goBack()">
+        ← Back to Dashboard
+    </button>
+
+    <h1>📦 Product Management</h1>
+
+    <!-- ADD PRODUCT -->
+    <div class="form-box">
+
+        <h2>Add Product</h2>
+
+        <input id="name"
+               placeholder="Product Name">
+
+        <input id="stock"
+                type="number"
+                placeholder="Stock Quantity">
+
+        <input id="description"
+               placeholder="Description">
+
+        <input id="price"
+               type="number"
+               placeholder="Price">
+
+<select id="category">
+<option value="">
+Select Category
+</option>
+</select>
+
+        <input id="image"
+                type="file"
+                accept="image/*">
+
+        <button class="add-btn"
+                onclick="addProduct()">
+            Add Product
+        </button>
+
+    </div>
+
+    <!-- PRODUCT LIST -->
+    <h2>All Products</h2>
+
+<!-- SIDE EDIT PANEL -->
+<div
+id="editPanel"
+style="
+display:none;
+position:fixed;
+top:50%;
+right:20px;
+transform:translateY(-50%);
+width:350px;
+max-height:85vh;
+overflow-y:auto;
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 4px 20px rgba(0,0,0,.2);
+z-index:999;
+">
+
+<h2>
+✏ Edit Product
+</h2>
+
+<input
+type="hidden"
+id="editId">
+
+<label>
+Product Name
+</label>
+
+<input
+id="editName"
+style="width:100%; margin-bottom:15px;">
+
+<label>
+Stock Quantity
+</label>
+
+<input
+id="editStock"
+type="number"
+style="width:100%; margin-bottom:15px;">
+
+<label>
+Description
+</label>
+
+<input
+id="editDescription"
+style="width:100%; margin-bottom:15px;">
+
+<label>
+Price (₱)
+</label>
+
+<input
+id="editPrice"
+type="number"
+style="width:100%; margin-bottom:15px;">
+
+<label>
+Category
+</label>
+
+<select
+id="editCategory"
+style="
+width:100%;
+margin-bottom:15px;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+">
+<option value="">
+Select Category
+</option>
+</select>
+
+<label>
+Change Product Image
+</label>
+
+<input
+type="file"
+id="editImage"
+accept="image/*"
+style="margin-bottom:20px;">
+
+<button
+class="add-btn"
+type="button"
+onclick="saveEdit()"
+style="
+width:100%;
+margin-bottom:10px;
+">
+
+💾 Save Changes
+
+</button>
+
+<button
+type="button"
+onclick="closeEdit()"
+style="
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+">
+
+✖ Close
+
+</button>
+</div>
+
+    <div id="products"
+         class="products-grid"></div>
+
+</div>
+
+<script>
+
+function goBack() {
+    window.location.href = "/admin";
+}
+
+// ===================
+// LOAD PRODUCTS
+// ===================
+async function loadProducts() {
+
+    const res =
+    await fetch(
+    '/admin/products'
+    );
+
+    const products =
+    await res.json();
+
+    const container =
+    document.getElementById(
+    "products"
+    );
+
+    container.innerHTML = "";
+
+    products.forEach(product => {
+
+        const card =
+        document.createElement(
+        'div'
+        );
+
+        card.className =
+        'product-card';
+
+        card.innerHTML = `
+
+            ${
+                product.image
+                ?
+                `
+                <img
+                src="${product.image}"
+                style="
+                width:100%;
+                height:220px;
+                object-fit:cover;
+                border-radius:12px;
+                margin-bottom:15px;
+                ">
+                `
+                :
+                ''
+            }
+
+            <h3>
+                ${product.name}
+            </h3>
+
+            <p>
+                <b>Description:</b>
+                ${product.description}
+            </p>
+
+            <p>
+                <b>Price:</b>
+                ₱${product.price}
+            </p>
+
+            <p>
+                <b>Category:</b>
+                ${product.category}
+            </p>
+
+            <p>
+                <b>Stock:</b>
+                ${product.stock}
+            </p>
+
+            <button
+            class="edit-btn">
+
+                Edit
+
+            </button>
+
+            <button
+            class="delete-btn">
+
+                Delete
+
+            </button>
+        `;
+
+        // EDIT BUTTON
+        card.querySelector(
+        '.edit-btn'
+        ).addEventListener(
+        'click',
+        ()=>{
+
+            editProduct(
+                product
+            );
+
+        });
+
+        // DELETE BUTTON
+        card.querySelector(
+        '.delete-btn'
+        ).addEventListener(
+        'click',
+        ()=>{
+
+            deleteProduct(
+            product.id
+            );
+
+        });
+
+        container.appendChild(
+        card
+        );
+    });
+}
+
+// ===================
+// ADD PRODUCT
+// ===================
+async function addProduct(){
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        'name',
+        document.getElementById(
+        'name'
+        ).value
+    );
+
+    formData.append(
+        'stock',
+        document.getElementById(
+        'stock'
+        ).value
+    );
+
+    formData.append(
+        'description',
+        document.getElementById(
+        'description'
+        ).value
+    );
+
+    formData.append(
+        'price',
+        document.getElementById(
+        'price'
+        ).value
+    );
+
+    formData.append(
+        'category',
+        document.getElementById(
+        'category'
+        ).value
+    );
+
+    const image =
+        document.getElementById(
+        'image'
+        ).files[0];
+
+    if(image){
+
+        formData.append(
+            'image',
+            image
+        );
+    }
+
+    const res =
+        await fetch(
+        '/admin/add-product',
+        {
+            method:'POST',
+            body:formData
+        });
+
+    const data =
+        await res.json();
+
+    alert(
+        data.message
+    );
+
+    location.reload();
+}
+
+// ===================
+// DELETE PRODUCT
+// ===================
+async function deleteProduct(id) {
+
+    const confirmDelete =
+        confirm(
+            "Delete this product?"
+        );
+
+    if (!confirmDelete) return;
+
+    await fetch(
+        '/admin/delete-product/' + id,
+    {
+        method: 'DELETE'
+    });
+
+    loadProducts();
+}
+
+function editProduct(product){
+
+    document.getElementById(
+    'editId'
+    ).value =
+    product.id;
+
+    document.getElementById(
+    'editName'
+    ).value =
+    product.name || '';
+
+    document.getElementById(
+    'editDescription'
+    ).value =
+    product.description || '';
+
+    document.getElementById(
+    'editPrice'
+    ).value =
+    product.price || '';
+
+    document.getElementById(
+    'editCategory'
+    ).value =
+    product.category || '';
+
+    document.getElementById(
+    'editStock'
+    ).value =
+    product.stock || '';
+
+    document.getElementById(
+    'editPanel'
+    ).style.display =
+    'block';
+}
+async function saveEdit(){
+
+    try{
+
+        const id =
+            document.getElementById(
+            'editId'
+            ).value;
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            'name',
+            document.getElementById(
+            'editName'
+            ).value
+        );
+
+        formData.append(
+            'description',
+            document.getElementById(
+            'editDescription'
+            ).value
+        );
+
+        formData.append(
+            'price',
+            document.getElementById(
+            'editPrice'
+            ).value
+        );
+
+        formData.append(
+            'category',
+            document.getElementById(
+            'editCategory'
+            ).value
+        );
+
+        formData.append(
+            'stock',
+            document.getElementById(
+            'editStock'
+            ).value
+        );
+
+        const image =
+            document.getElementById(
+            'editImage'
+            ).files[0];
+
+        if(image){
+
+            formData.append(
+                'image',
+                image
+            );
+        }
+
+        const res =
+            await fetch(
+            '/admin/update-product/' + id,
+            {
+                method:'PUT',
+                body:formData
+            });
+
+        const data =
+            await res.json();
+
+        alert(
+            data.message
+        );
+
+        document.getElementById(
+        'editPanel'
+        ).style.display =
+        'none';
+
+        loadProducts();
+
+    }catch(err){
+
+        console.log(err);
+
+        alert(
+        "Failed to update product"
+        );
+    }
+}
+
+function closeEdit(){
+
+    document.getElementById(
+    'editPanel'
+    ).style.display =
+    'none';
+}
+
+// ===================
+// LOAD CATEGORIES
+// ===================
+async function
+loadCategories(){
+
+    const res =
+    await fetch(
+    '/categories'
+    );
+
+    const categories =
+    await res.json();
+
+    const categorySelect =
+    document.getElementById(
+    'category'
+    );
+
+    const editCategorySelect =
+    document.getElementById(
+    'editCategory'
+    );
+
+    categorySelect.innerHTML =
+    `
+    <option value="">
+    Select Category
+    </option>
+    `;
+
+    editCategorySelect.innerHTML =
+    `
+    <option value="">
+    Select Category
+    </option>
+    `;
+
+    categories.forEach(cat=>{
+
+        categorySelect.innerHTML +=
+        `
+        <option value="${cat.name}">
+            ${cat.name}
+        </option>
+        `;
+
+        editCategorySelect.innerHTML +=
+        `
+        <option value="${cat.name}">
+            ${cat.name}
+        </option>
+        `;
+    });
+}
+
+loadCategories();
+loadProducts();
+
+</script>
+
+</body>
+</html>

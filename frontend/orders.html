@@ -79,39 +79,158 @@ async function loadOrders() {
         `;
         return;
     }
+orders.forEach(order => {
 
-    orders.forEach(order => {
+    container.innerHTML += `
 
-        container.innerHTML += `
-            <div class="order-card">
+        <div class="order-card">
 
-                <h3>
-                    Order #${order.id}
-                </h3>
+            <h3>
+                Order #${order.id}
+            </h3>
 
-                <p>
-                    Total:
-                    ₱${order.total}
-                </p>
+            <p>
+                <b>Total:</b>
+                ₱${order.total}
+            </p>
 
-                <p>
-                    Status:
-                    <span class="status">
-                        ${order.status}
-                    </span>
-                </p>
+            ${
+                order.items
+                ?
 
-                <p>
-                    Date:
-                    ${new Date(
-                        order.created_at
-                    ).toLocaleString()}
-                </p>
+                `
+                <div
+                style="
+                margin:15px 0;
+                padding:15px;
+                background:#fafafa;
+                border-radius:12px;
+                border:1px solid #eee;
+                ">
 
-            </div>
-        `;
-    });
+                    <b>
+                    📦 Items Bought:
+                    </b>
+
+                    <div
+                    style="
+                    margin-top:10px;
+                    ">
+
+                        ${
+                            order.items
+                            .split('|||')
+
+                            .map(item =>
+
+                            `
+                            <div
+                            style="
+                            margin-bottom:6px;
+                            ">
+
+                            • ${item}
+
+                            </div>
+                            `
+
+                            ).join('')
+                        }
+
+                    </div>
+
+                </div>
+                `
+
+                :
+
+                ''
+            }
+
+            <p>
+                <b>Status:</b>
+
+                <span class="status">
+
+                    ${order.status}
+
+                </span>
+            </p>
+
+            <p>
+                <b>Date:</b>
+
+                ${new Date(
+                    order.created_at
+                ).toLocaleString()}
+
+            </p>
+
+            ${
+order.status === 'Approved'
+
+?
+
+`
+<button
+onclick="
+viewOR(
+${order.id}
+)">
+
+🧾 View Receipt
+
+</button>
+`
+
+:
+
+order.status === 'Refunded'
+
+&&
+
+order.refund_proof
+
+?
+
+`
+<button
+onclick="
+window.open(
+'${order.refund_proof}',
+'_blank'
+)
+"
+style="
+background:#2196f3;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+">
+
+💸 View Refund Proof
+
+</button>
+`
+
+:
+
+''          }
+
+        </div>
+    `;
+});
+    
 }
+function viewOR(id){
+
+    window.location.href =
+    '/receipt/' + id;
+}
+
 
 loadOrders();
 

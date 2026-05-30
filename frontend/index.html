@@ -21,28 +21,52 @@
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="/shop.html">Products</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Support</a></li>
+            <li><a href="/about.html">About Us</a></li>
+
         </ul>
     </nav>
 
     <div class="nav-actions">
 
-        <input type="text" placeholder="Search products..." class="search-bar">
+<input
+type="text"
+placeholder="Search products..."
+class="search-bar"
+id="searchInput"
+
+onkeypress="
+if(event.key==='Enter')
+searchProducts()
+">
 
         <!-- LOGIN AREA -->
         <div id="authArea"></div>
 
         <!-- 👑 ADMIN BUTTON (hidden by default) -->
-        <button id="adminBtn" style="display:none;" onclick="goAdmin()">
-            👨‍💻 Admin Panel
-        </button>
+<button
+id="adminBtn"
+class="admin-panel-btn"
+onclick="
+window.location.href=
+'/admin'
+"
+style="display:none;">
 
-        <button class="cart-btn" onclick="goCart()">
-            🛒 Cart
-        </button>
+🛠 Admin Panel
 
-    </div>
+</button>
+
+<button class="cart-btn" onclick="goCart()">
+    🛒 Cart
+</button>
+
+<button
+class="message-btn"
+onclick="goMessages()">
+
+    💬
+
+</button>
 
 </header>
 
@@ -54,9 +78,10 @@
         <h1>Fellowship Baptist College Marketplace</h1>
 
         <p>
-            Buy uniforms, books, department shirts,
-            and student essentials in one place.
+            Wear the legacy. Live the excellence
         </p>
+
+          <p class="tagline">Shaping lives since 1954</p>
 
         <button class="shop-btn" onclick="goShop()">
             Shop Now
@@ -66,57 +91,39 @@
 
 </section>
 
-<!-- CATEGORIES -->
+<!-- SHOP CATEGORIES -->
+
 <section class="categories">
 
-    <h2>Shop Categories</h2>
+    <h2>
 
-    <div class="category-grid">
+        Shop Categories
 
-        <div class="category-card">
-            <h3>👕 P.E Uniform</h3>
-        </div>
+    </h2>
 
-        <div class="category-card">
-            <h3>🎓 School Uniform</h3>
-        </div>
+    <div
+    class="category-grid"
 
-        <div class="category-card">
-            <h3>🏫 Department Shirts</h3>
-        </div>
-
-        <div class="category-card">
-            <h3>📚 Books</h3>
-        </div>
+    id="shopCategories">
 
     </div>
 
 </section>
 
-<!-- FEATURED -->
+<!-- FEATURED CATEGORIES -->
+
 <section class="featured-products">
 
-    <h2>Featured Products</h2>
+    <h2>
 
-    <div class="products-grid">
+        ✨ Featured Categories
 
-        <div class="product-card">
-            <img src="https://via.placeholder.com/250">
-            <h3>P.E Uniform</h3>
-            <button onclick="goShop()">View Product</button>
-        </div>
+    </h2>
 
-        <div class="product-card">
-            <img src="https://via.placeholder.com/250">
-            <h3>Department Shirt</h3>
-            <button onclick="goShop()">View Product</button>
-        </div>
+    <div
+    class="products-grid"
 
-        <div class="product-card">
-            <img src="https://via.placeholder.com/250">
-            <h3>Books</h3>
-            <button onclick="goShop()">View Product</button>
-        </div>
+    id="featuredCategories">
 
     </div>
 
@@ -129,6 +136,25 @@
 </footer>
 
 <script>
+
+function
+searchProducts(){
+
+    const keyword =
+    document
+    .getElementById(
+    'searchInput'
+    )
+    .value
+    .trim();
+
+    window.location.href =
+    '/shop.html?search='
+    +
+    encodeURIComponent(
+    keyword
+    );
+}
 
 // =====================
 // NAVIGATION
@@ -226,7 +252,224 @@ async function checkAuth() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", checkAuth);
+async function
+checkAdmin(){
+
+    const res =
+        await fetch(
+        '/me',
+        {
+            credentials:
+            'include'
+        });
+
+    const user =
+        await res.json();
+
+    if(
+        user.loggedIn
+        &&
+        user.is_admin == 1
+    ){
+
+        document
+        .getElementById(
+        'adminBtn'
+        )
+        .style.display =
+        'inline-block';
+    }
+}
+
+checkAdmin();
+
+async function
+setMessageRoute(){
+
+    try{
+
+        const res =
+        await fetch(
+        '/current-user'
+        );
+
+        const user =
+        await res.json();
+
+        window.currentUser =
+        user;
+
+    }catch(err){
+
+        console.log(err);
+    }
+}
+
+
+function
+goMessages(){
+
+    if(
+        window.currentUser &&
+        window.currentUser.is_admin
+    ){
+
+        window.location.href =
+        '/admin-messages';
+
+    }else{
+
+        window.location.href =
+        '/messages-page';
+    }
+}
+
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+
+    checkAuth();
+
+    setMessageRoute();
+});
+
+function
+goBack(){
+
+    window.location.href =
+    '/index.html';
+}
+// =====================
+// LOAD FEATURED
+// CATEGORIES
+// =====================
+async function
+loadFeaturedCategories(){
+
+    const res =
+    await fetch(
+    '/categories'
+    );
+
+    const categories =
+    await res.json();
+
+    const featured =
+    categories.filter(c=>
+
+        c.featured == 1
+        &&
+
+        c.hidden != 1
+    );
+
+    const container =
+    document
+    .getElementById(
+    'featuredCategories'
+    );
+
+    container.innerHTML =
+    '';
+
+    featured.forEach(cat=>{
+
+        container.innerHTML +=
+        `
+        <div
+        class="product-card">
+
+            <img src="${
+                cat.image
+                ||
+                'https://via.placeholder.com/250'
+            }">
+
+            <h3>
+
+                ${cat.name}
+
+            </h3>
+
+            <button
+            onclick="goShop()">
+
+                View Category
+
+            </button>
+
+        </div>
+        `;
+    });
+}
+
+loadFeaturedCategories();
+// =====================
+// LOAD SHOP
+// CATEGORIES
+// =====================
+async function
+loadShopCategories(){
+
+    const res =
+    await fetch(
+    '/categories'
+    );
+
+    const categories =
+    await res.json();
+
+    const visible =
+    categories.filter(c=>
+
+        c.hidden != 1
+    );
+
+    const container =
+    document
+    .getElementById(
+    'shopCategories'
+    );
+
+    container.innerHTML =
+    '';
+
+    visible.forEach(cat=>{
+
+        container.innerHTML +=
+        `
+        <div
+        class="category-card"
+
+        onclick="goShop()">
+
+            <img src="${
+                cat.image
+                ||
+                'https://via.placeholder.com/300'
+            }"
+
+            style="
+            width:100%;
+            height:150px;
+            object-fit:cover;
+            border-radius:14px;
+            margin-bottom:10px;
+            ">
+
+            <h3>
+
+                ${cat.name}
+
+            </h3>
+
+        </div>
+        `;
+    });
+}
+
+loadShopCategories();
 
 </script>
 

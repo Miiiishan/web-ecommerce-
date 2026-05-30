@@ -2,92 +2,575 @@
 <html>
 <head>
     <title>FBC Marketplace - Shop</title>
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet"
+    href="style.css">
+
+    <style>
+
+    body{
+        font-family:
+        Poppins,sans-serif;
+        background:#f5f5f5;
+        margin:0;
+    }
+
+    /* NAVBAR */
+    .navbar{
+        background:#6d0f1d;
+        color:white;
+        padding:15px 30px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+    }
+
+    .nav-buttons{
+        display:flex;
+        gap:10px;
+    }
+
+    .nav-btn{
+        background:white;
+        color:#6d0f1d;
+        border:none;
+        padding:10px 15px;
+        border-radius:10px;
+        cursor:pointer;
+        font-weight:bold;
+    }
+
+    .nav-btn:hover{
+        opacity:.9;
+    }
+
+    /* PRODUCTS */
+    .title{
+        text-align:center;
+        color:#6d0f1d;
+        margin-top:30px;
+    }
+
+    .products-grid{
+        width:90%;
+        margin:30px auto;
+        display:grid;
+        grid-template-columns:
+        repeat(auto-fit,
+        minmax(250px,1fr));
+        gap:20px;
+    }
+
+    .product-card{
+        background:white;
+        border-radius:15px;
+        padding:20px;
+        box-shadow:
+        0 4px 10px
+        rgba(0,0,0,.1);
+        text-align:center;
+    }
+
+    .product-card h3{
+        color:#6d0f1d;
+    }
+
+    .stock{
+        color:green;
+        font-weight:bold;
+    }
+
+    .add-btn{
+        background:#6d0f1d;
+        color:white;
+        border:none;
+        padding:12px 20px;
+        border-radius:10px;
+        cursor:pointer;
+        margin-top:10px;
+    }
+
+    .add-btn:hover{
+        opacity:.9;
+    }
+
+    .product-image{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:10px;
+    }
+/* FILTER BAR */
+
+.filter-bar{
+
+    width:90%;
+
+    margin:
+    25px auto;
+
+    display:flex;
+
+    gap:15px;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+}
+
+.filter-bar input,
+.filter-bar select{
+
+    padding:14px 18px;
+
+    border-radius:12px;
+
+    border:
+    2px solid #ddd;
+
+    font-size:15px;
+
+    outline:none;
+
+    min-width:250px;
+
+    transition:.25s;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus{
+
+    border-color:#6d0f1d;
+}
+    </style>
 </head>
+
 <body>
 
-<h1 style="text-align:center; color:#6d0f1d;">
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <h2>
+        🛍 FBC Marketplace
+    </h2>
+
+    <div class="nav-buttons">
+
+        <button
+        class="nav-btn"
+        onclick="goHome()">
+
+        Home
+
+        </button>
+
+        <button
+        class="nav-btn"
+        onclick="goCart()">
+
+        Cart
+
+        </button>
+
+        <button
+        class="nav-btn"
+        onclick="goAccount()">
+
+        Account
+
+        </button>
+
+    </div>
+
+</div>
+
+<h1 class="title">
     FBC Marketplace
 </h1>
 
-<div id="products" class="products-grid"></div>
+<div class="filter-bar">
+
+    <input
+    type="text"
+    id="searchInput"
+    placeholder="🔍 Search products...">
+
+<select
+id="categoryFilter">
+
+    <option value="">
+        All Categories
+    </option>
+
+</select>
+
+</div>
+
+<div
+id="products"
+class="products-grid">
+
+Loading products...
+
+</div>
+
 <script>
-async function checkLogin() {
-    const res = await fetch('/me', {
-        credentials: 'include'
-    });
 
-    const data = await res.json();
+// ======================
+// LOAD PRODUCTS
+// ======================
+async function addToCart(productId){
 
-    const authArea = document.getElementById("authArea");
+    try{
 
-    if (data.loggedIn) {
-        authArea.innerHTML = `
-            <span>👋 ${data.name}</span>
-            <button onclick="logout()">Logout</button>
-        `;
+        const res =
+            await fetch(
+            '/cart/add',
+            {
+                method:'POST',
+
+                headers:{
+                    'Content-Type':
+                    'application/json'
+                },
+
+                credentials:'include',
+
+                body:JSON.stringify({
+                    product_id:
+                    productId
+                })
+            });
+
+        const data =
+            await res.json();
+
+        alert(
+            data.message
+        );
+
+    }catch(err){
+
+        console.log(err);
+
+        alert(
+        "Failed to add to cart"
+        );
     }
 }
+async function
+loadProducts(){
 
-checkLogin();
-</script>
-<script>
-async function loadProducts() {
-    try {
-        const res = await fetch('/products');
-        const products = await res.json();
+    try{
 
-        const container = document.getElementById('products');
-        container.innerHTML = "";
+        const res =
+        await fetch(
+        '/products'
+        );
 
-        products.forEach(p => {
+        let products =
+        await res.json();
+
+        const search =
+        document
+        .getElementById(
+        'searchInput'
+        )
+        ?.value
+        .toLowerCase()
+        || '';
+
+        const category =
+        document
+        .getElementById(
+        'categoryFilter'
+        )
+        ?.value
+        || '';
+
+        // FILTER PRODUCTS
+        products =
+        products.filter(p=>{
+
+            const matchSearch =
+
+                p.name
+                .toLowerCase()
+                .includes(search)
+
+                ||
+
+                p.description
+                ?.toLowerCase()
+                .includes(search);
+
+            const matchCategory =
+
+                !category
+
+                ||
+
+                p.category
+                ===
+                category;
+
+            return (
+                matchSearch
+                &&
+                matchCategory
+            );
+        });
+
+        const container =
+        document
+        .getElementById(
+        'products'
+        );
+
+        container.innerHTML='';
+
+        if(
+            products.length === 0
+        ){
+
+            container.innerHTML=
+            `
+            <h2 style="
+            text-align:center;
+            color:#666;
+            grid-column:1/-1;
+            ">
+
+            No products found 😢
+
+            </h2>
+            `;
+
+            return;
+        }
+
+        products.forEach(p=>{
+
             container.innerHTML += `
-                <div class="product-card">
-                    <h3>${p.name}</h3>
-                    <p>${p.category}</p>
-                    <p>${p.description}</p>
-                    <p><b>₱${p.price}</b></p>
+            <div class="product-card">
 
-                    <button onclick="addToCart(${p.id})">
-                        Add to Cart
-                    </button>
-                </div>
+                ${
+                    p.image
+                    ?
+                    `
+                    <img
+                    src="${p.image}"
+                    alt="${p.name}"
+                    class="product-image">
+                    `
+                    :
+                    ''
+                }
+
+                <h3>
+                    ${p.name}
+                </h3>
+
+                <p>
+                    ${p.category}
+                </p>
+
+                <p>
+                    ${p.description}
+                </p>
+
+                <p>
+
+                    <b>
+
+                    ₱${p.price}
+
+                    </b>
+
+                </p>
+
+                <p>
+
+                    Stock:
+                    <b>
+
+                    ${p.stock}
+
+                    </b>
+
+                </p>
+
+                <button
+                class="add-btn"
+                onclick="
+                addToCart(
+                ${p.id}
+                )">
+
+                🛒 Add To Cart
+
+                </button>
+
+                <button
+                class="add-btn"
+
+                style="
+                background:#2563eb;
+                margin-top:10px;
+                "
+
+                onclick="
+                openMessage(
+                ${p.id}
+                )">
+
+                💬 Ask Product
+
+                </button>
+
+            </div>
             `;
         });
 
-    } catch (err) {
+    }catch(err){
+
         console.log(err);
-        alert("Failed to load products");
+
+        alert(
+        'Failed to load products'
+        );
     }
 }
+// ======================
+// NAVIGATION
+// ======================
+function goHome(){
+    window.location.href =
+    "/";
+}
 
+function goCart(){
+    window.location.href =
+    "/cart.html";
+}
 
-// =======================
-// CART (SESSION BASED)
-// =======================
-async function addToCart(productId) {
-    try {
-        const res = await fetch('/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+function goAccount(){
+    window.location.href =
+    "/account.html";
+}
+
+document
+.addEventListener(
+'input',
+(e)=>{
+
+    if(
+
+        e.target.id ===
+        'searchInput'
+
+        ||
+
+        e.target.id ===
+        'categoryFilter'
+
+    ){
+
+        loadProducts();
+    }
+});
+
+async function
+loadCategories(){
+
+    const res =
+    await fetch(
+    '/categories'
+    );
+
+    const categories =
+    await res.json();
+
+    const select =
+    document
+    .getElementById(
+    'categoryFilter'
+    );
+
+    select.innerHTML =
+    `
+    <option value="">
+        All Categories
+    </option>
+    `;
+
+    categories.forEach(c=>{
+
+        select.innerHTML +=
+        `
+        <option value=
+        "${c.name}">
+
+        ${c.name}
+
+        </option>
+        `;
+    });
+}
+
+loadCategories();
+
+loadProducts();
+
+async function
+openMessage(
+productId
+){
+
+    const message =
+        prompt(
+        'Ask about this product'
+        );
+
+    if(
+        !message
+    ) return;
+
+    const res =
+        await fetch(
+        '/send-message',
+        {
+
+            method:'POST',
+
+            headers:{
+                'Content-Type':
+                'application/json'
             },
-            credentials: 'include', // 🔥 IMPORTANT FOR SESSION
-            body: JSON.stringify({
-                product_id: productId
+
+            credentials:
+            'include',
+
+            body:
+            JSON.stringify({
+
+                product_id:
+                productId,
+
+                message:
+                message
             })
         });
 
-        const data = await res.json();
-        alert(data.message);
+    const data =
+        await res.json();
 
-    } catch (err) {
-        console.log(err);
-        alert("Failed to add to cart");
-    }
+    alert(
+        data.message
+    );
 }
 
-loadProducts();
 </script>
 
 </body>
