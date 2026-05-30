@@ -4,7 +4,7 @@ const db = mysql.createConnection({
   host: process.env.DB_HOST || "sql12.freesqldatabase.com",
   user: process.env.DB_USER || "sql12828718",
   password: process.env.DB_PASSWORD || "rRT1eRRrFP",
-  database: process.env.DB_NAME || "my_app",
+  database: process.env.DB_NAME || "sql12828718",
   port: process.env.DB_PORT || 3306
 });
 
